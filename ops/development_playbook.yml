@@ -1,0 +1,8 @@
+---
+ - hosts: stonecutter-journey-test
+
+   roles:
+    - common
+    - dev
+    - leiningen
+
