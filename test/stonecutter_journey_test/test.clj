@@ -33,7 +33,7 @@
    (after :contents (do (wd/quit)))]
 
   (fact "can go to client page"
-        (wd/to "http://stonecutter-client.herokuapp.com")
+        (wd/to "https://stonecutter-client.herokuapp.com")
         (wait-for-title "Home")
         (screenshot "client_home_page")
-        (wd/current-url) => "http://stonecutter-client.herokuapp.com/login"))
+        (wd/current-url) => "https://stonecutter-client.herokuapp.com/login"))
