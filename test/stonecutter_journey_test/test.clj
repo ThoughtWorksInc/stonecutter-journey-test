@@ -30,10 +30,25 @@
 (against-background
   [(before :contents (do (wd/set-driver! {:browser :firefox})
                          (clear-screenshots)))
-   (after :contents (do (wd/quit)))]
+   (after  :contents (do (wd/quit)))]
 
   (fact "can go to client page"
         (wd/to "https://stonecutter-client.herokuapp.com")
         (wait-for-title "Home")
         (screenshot "client_home_page")
-        (wd/current-url) => "https://stonecutter-client.herokuapp.com/login"))
+        (wd/current-url) => (contains "stonecutter-client.herokuapp.com/login"))
+
+  (fact "'sign in to vote' redirects to stonecutter"
+        (wd/click "button")
+        (wait-for-title "Sign in")
+        (screenshot "stonecutter_sign_in")
+        (wd/current-url) => (contains "stonecutter.herokuapp.com/sign-in"))
+
+  (fact "can sign in with existing user credentials and redirects to client app voting page"
+        (wd/input-text ".func--email__input" "stonecutter-journey-test@tw.com")
+        (wd/input-text ".func--password__input" "password")
+        (wd/click ".func--sign-in__button")
+        (wait-for-title "Poll: Soho requires safer cycle lanes?") 
+        (screenshot "client_voting_page")
+        (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+        (wd/page-source) => (contains "stonecutter-journey-test@tw.com")))
