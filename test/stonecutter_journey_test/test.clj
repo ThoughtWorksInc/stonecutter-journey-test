@@ -53,7 +53,7 @@
         (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation"))
 
   (fact "authorising app redirects to voting page"
-        (wd/click ":.func--authorise-share-profile__button")
+        (wd/click ".func--authorise-share-profile__button")
         (wait-for-title "Poll: Soho requires safer cycle lanes?")
         (screenshot "client_voting_page")
         (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
