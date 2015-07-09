@@ -44,11 +44,17 @@
         (screenshot "stonecutter_sign_in")
         (wd/current-url) => (contains "stonecutter.herokuapp.com/sign-in"))
 
-  (fact "can sign in with existing user credentials and redirects to client app voting page"
+  (fact "can sign in with existing user credentials and redirects to authorisation form page"
         (wd/input-text ".func--email__input" "stonecutter-journey-test@tw.com")
         (wd/input-text ".func--password__input" "password")
         (wd/click ".func--sign-in__button")
-        (wait-for-title "Poll: Soho requires safer cycle lanes?") 
+        (wait-for-title "Authorise")
+        (screenshot "stonecutter_authorisation_form")
+        (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation"))
+
+  (fact "authorising app redirects to voting page"
+        (wd/click ":.func--authorise-share-profile__button")
+        (wait-for-title "Poll: Soho requires safer cycle lanes?")
         (screenshot "client_voting_page")
         (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
         (wd/page-source) => (contains "stonecutter-journey-test@tw.com")))
