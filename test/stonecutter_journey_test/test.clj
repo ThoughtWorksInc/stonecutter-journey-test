@@ -50,6 +50,9 @@
 (def stonecutter-register-create-profile-button ".func--create-profile__button")
 (def stonecutter-profile-created-page-body ".func--profile-created-page")
 (def stonecutter-authorise-page-body ".func--authorise-page")
+(def stonecutter-authorise-failure-body ".func--authorise-failure-page")
+(def stonecutter-authorise-cancel-link ".func--authorise-cancel__link")
+(def stonecutter-authorise-return-to-client-link ".func--redirect-to-client-home__link")
 (def stonecutter-authorise-share-profile-button ".func--authorise-share-profile__button")
 (def stonecutter-delete-account-page-body ".func--delete-account-page")
 (def stonecutter-delete-account-button ".func--delete-account__button")
@@ -145,7 +148,18 @@
           (screenshot "stonecutter_authorisation_form")
           (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation"))
 
+    (fact "denying app redirects to home page"
+          (wd/click stonecutter-authorise-cancel-link)
+          (wait-for-selector stonecutter-authorise-failure-body)
+          (screenshot "sstonecutter_authorise_failure")
+          (wd/click stonecutter-authorise-return-to-client-link)
+          (wait-for-selector client-home-page-body)
+          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/page-source) =not=> (contains "stonecutter-journey-test@tw.com"))
+
     (fact "authorising app redirects to voting page"
+          (wd/click "button")
+          (wait-for-selector stonecutter-authorise-page-body)
           (wd/click stonecutter-authorise-share-profile-button)
           (wait-for-selector client-poll-page-body)
           (screenshot "client_voting_page")
