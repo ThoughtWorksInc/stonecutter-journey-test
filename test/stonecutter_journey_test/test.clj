@@ -57,4 +57,14 @@
         (wait-for-title "Poll: Soho requires safer cycle lanes?")
         (screenshot "client_voting_page")
         (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+        (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
+
+  (fact "logging out in client app and logging in again will skip sign in page"
+        (wd/click ".func--logout__link")
+        (wait-for-title "Home")
+        (wd/click "button")
+        (wait-for-title "Authorise")
+        (wd/click ".func--authorise-share-profile__button")
+        (wait-for-title "Poll: Soho requires safer cycle lanes?")
+        (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
         (wd/page-source) => (contains "stonecutter-journey-test@tw.com")))
