@@ -151,10 +151,10 @@
     (fact "denying app redirects to home page"
           (wd/click stonecutter-authorise-cancel-link)
           (wait-for-selector stonecutter-authorise-failure-body)
-          (screenshot "sstonecutter_authorise_failure")
+          (screenshot "stonecutter_authorise_failure")
           (wd/click stonecutter-authorise-return-to-client-link)
           (wait-for-selector client-home-page-body)
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/login")
           (wd/page-source) =not=> (contains "stonecutter-journey-test@tw.com"))
 
     (fact "authorising app redirects to voting page"
