@@ -49,6 +49,7 @@
 (def stonecutter-register-confirm-password-input ".func--confirm-password__input")
 (def stonecutter-register-create-profile-button ".func--create-profile__button")
 (def stonecutter-profile-created-page-body ".func--profile-created-page")
+(def stonecutter-profile-created-next-link ".func--profile-created-next__button")
 (def stonecutter-authorise-page-body ".func--authorise-page")
 (def stonecutter-authorise-failure-body ".func--authorise-failure-page")
 (def stonecutter-authorise-cancel-link ".func--authorise-cancel__link")
@@ -182,6 +183,36 @@
 
           (confirm-delete-account)
           (screenshot "stonecutter_profile-deleted")
+          (wd/current-url) => (contains "stonecutter.herokuapp.com/profile-deleted"))
+
+    (fact "can continue to authorise app even when registering a new account"
+          (wd/to "https://stonecutter-client.herokuapp.com")
+          (wait-for-selector client-home-page-body)
+          (wd/click "button")
+          (wait-for-selector stonecutter-sign-in-page-body)
+          (wd/click stonecutter-sign-in-page-register-link)
+          (wait-for-selector stonecutter-register-page-body)
+
+          ;; Enter user details to register
+          (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
+          (wd/input-text stonecutter-register-password-input "password")
+          (wd/input-text stonecutter-register-confirm-password-input "password")
+          (wd/click stonecutter-register-create-profile-button)
+
+          ;; View profile created page
+          (wait-for-selector stonecutter-profile-created-page-body)
+          (screenshot "stonecutter_profile_created_page_from_auth")
+
+          (wd/click stonecutter-profile-created-next-link)
+          (wait-for-selector stonecutter-authorise-page-body)
+
+          (screenshot "stonecutter_authorisation_form_after_registration")
+          (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation")
+
+          ;; Cleaning up
+          (go-to-delete-account)
+          (wd/current-url) => (contains "stonecutter.herokuapp.com/delete-account")
+          (confirm-delete-account)
           (wd/current-url) => (contains "stonecutter.herokuapp.com/profile-deleted"))
 
     (catch Exception e
