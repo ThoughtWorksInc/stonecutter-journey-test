@@ -48,8 +48,13 @@
 (def stonecutter-register-password-input ".func--password__input")
 (def stonecutter-register-confirm-password-input ".func--confirm-password__input")
 (def stonecutter-register-create-profile-button ".func--create-profile__button")
+(def stonecutter-profile-page-body ".func--profile-page")
+(def stonecutter-profile-unshare-profile-card-link ".func--app-item__unshare-link")
 (def stonecutter-profile-created-page-body ".func--profile-created-page")
 (def stonecutter-profile-created-next-link ".func--profile-created-next__button")
+(def stonecutter-profile-deleted-page-body ".func--profile-deleted-page")
+(def stonecutter-unshare-profile-card-page-body ".func--unshare-profile-card-page")
+(def stonecutter-unshare-profile-card-button ".func--unshare-profile-card__button")
 (def stonecutter-authorise-page-body ".func--authorise-page")
 (def stonecutter-authorise-failure-body ".func--authorise-failure-page")
 (def stonecutter-authorise-cancel-link ".func--authorise-cancel__link")
@@ -57,7 +62,6 @@
 (def stonecutter-authorise-share-profile-button ".func--authorise-share-profile__button")
 (def stonecutter-delete-account-page-body ".func--delete-account-page")
 (def stonecutter-delete-account-button ".func--delete-account__button")
-(def stonecutter-profile-deleted-page-body ".func--profile-deleted-page")
 
 (def client-home-page-body ".func--home-page")
 (def client-poll-page-body ".func--poll-page")
@@ -88,12 +92,13 @@
     (go-to-delete-account)
     (confirm-delete-account)))
 
-(defn logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-again []
+(defn logout-of-client-and-click-sign-in-to-vote []
   (wd/click client-logout-link)
   (wait-for-selector client-home-page-body)
-  (wd/click "button")
-  (wait-for-selector stonecutter-authorise-page-body)
-  (wd/click stonecutter-authorise-share-profile-button)
+  (wd/click "button"))
+
+(defn logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again []
+  (logout-of-client-and-click-sign-in-to-vote)
   (wait-for-selector client-poll-page-body))
 
 (against-background
@@ -167,12 +172,39 @@
           (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
-    (fact "logging out in client app and logging in again will skip sign in page (repeats twice as there was a bug)"
-          (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-again)
+    (fact "logging out in client app and logging in again will skip sign in page
+          and authorise page (repeats twice as there was a bug)"
+          (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again)
           (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com")
 
-          (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-again)
+          (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again)
+          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
+
+    (fact "can unshare profile card and then logging in to client app will require authorising the app again"
+          ;; unshare profile card
+          (wd/to "https://stonecutter.herokuapp.com/profile")
+          (wait-for-selector stonecutter-profile-page-body)
+          (screenshot "stonecutter_profile_with_client_app")
+          (wd/click stonecutter-profile-unshare-profile-card-link)
+          (wait-for-selector stonecutter-unshare-profile-card-page-body)
+          (screenshot "stonecutter_unshare_profile_card")
+          (wd/click stonecutter-unshare-profile-card-button)
+          (wait-for-selector stonecutter-profile-page-body)
+          (screenshot "stonecutter_profile_without_client_app")
+
+          ;; login to client app
+          (wd/to "https://stonecutter-client.herokuapp.com")
+          (logout-of-client-and-click-sign-in-to-vote)
+          (wait-for-selector stonecutter-authorise-page-body)
+          (screenshot "stonecutter_authorisation_form_again")
+          (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation")
+
+          ;; authorise client app
+          (wd/click stonecutter-authorise-share-profile-button)
+          (wait-for-selector client-poll-page-body)
+          (screenshot "client_voting_page_again")
           (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
@@ -187,8 +219,7 @@
 
     (fact "can continue to authorise app even when registering a new account"
           (wd/to "https://stonecutter-client.herokuapp.com")
-          (wait-for-selector client-home-page-body)
-          (wd/click "button")
+          (logout-of-client-and-click-sign-in-to-vote)
           (wait-for-selector stonecutter-sign-in-page-body)
           (wd/click stonecutter-sign-in-page-register-link)
           (wait-for-selector stonecutter-register-page-body)
@@ -216,4 +247,5 @@
           (wd/current-url) => (contains "stonecutter.herokuapp.com/profile-deleted"))
 
     (catch Exception e
-      (screenshot "ERROR"))))
+      (screenshot "ERROR")
+      (throw e))))
