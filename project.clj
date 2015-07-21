@@ -4,6 +4,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [midje "1.6.3"]
                  [xml-apis "1.4.01"]
+                 [environ "1.0.0"]
                  [clj-webdriver "0.6.1" :exclusions [org.seleniumhq.selenium/selenium-java
                                                      org.seleniumhq.selenium/selenium-server
                                                      org.seleniumhq.selenium/selenium-remote-driver

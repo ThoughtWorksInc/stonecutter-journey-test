@@ -1,5 +1,6 @@
 (ns stonecutter-journey-test.test
   (:require [midje.sweet :refer :all]
+            [environ.core :as env]
             [clojure.java.io :as io]
             [clj-webdriver.taxi :as wd]
             [clj-webdriver.core :as wc]))
@@ -37,7 +38,7 @@
               (filter #(re-matches #".*\.png$" (.getName %)))
               (map io/delete-file))))
 
-(def stonecutter-url "stonecutter.herokuapp.com")
+(def stonecutter-url (get env/env :stonecutter-url "stonecutter.herokuapp.com"))
 (def stonecutter-sign-in-page-body ".func--sign-in-page")
 (def stonecutter-sign-in-page-register-link ".func--register__link")
 (def stonecutter-sign-in-email-input ".func--email__input")
@@ -63,6 +64,7 @@
 (def stonecutter-delete-account-page-body ".func--delete-account-page")
 (def stonecutter-delete-account-button ".func--delete-account__button")
 
+(def stonecutter-client-url (get env/env :stonecutter-client-url "stonecutter-client.herokuapp.com"))
 (def client-home-page-body ".func--home-page")
 (def client-poll-page-body ".func--poll-page")
 (def client-logout-link ".func--logout__link")
@@ -112,13 +114,13 @@
           ;; Go to home page and get redirected to sign-in
           (wd/to (str "https://" stonecutter-url))
           (wait-for-selector stonecutter-sign-in-page-body)
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/sign-in")
+          (wd/current-url) => (contains (str stonecutter-url "/sign-in"))
 
           ;; Click through to register page
           (wd/click stonecutter-sign-in-page-register-link)
           (wait-for-selector stonecutter-register-page-body)
           (screenshot "stonecutter_register_page")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/register")
+          (wd/current-url) => (contains (str stonecutter-url "/register"))
 
           ;; Enter user details to register
           (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
@@ -129,30 +131,30 @@
           ;; View profile created page
           (wait-for-selector stonecutter-profile-created-page-body)
           (screenshot "stonecutter_profile_created_page")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/profile-created"))
+          (wd/current-url) => (contains (str stonecutter-url "/profile-created")))
 
     (fact "can sign out of stonecutter"
           (wd/to (str "https://" stonecutter-url "/sign-out"))
           (wait-for-selector stonecutter-sign-in-page-body)
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/sign-in"))
+          (wd/current-url) => (contains (str stonecutter-url "/sign-in")))
 
     (fact "can go to client page"
-          (wd/to "https://stonecutter-client.herokuapp.com")
+          (wd/to (str "https://" stonecutter-client-url))
           (wait-for-selector client-home-page-body)
           (screenshot "client_home_page")
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/login"))
+          (wd/current-url) => (contains (str stonecutter-client-url "/login")))
 
     (fact "'sign in to vote' redirects to stonecutter"
           (wd/click "button")
           (wait-for-selector stonecutter-sign-in-page-body)
           (screenshot "stonecutter_sign_in")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/sign-in"))
+          (wd/current-url) => (contains (str stonecutter-url "/sign-in")))
 
     (fact "can sign in with existing user credentials and redirects to authorisation form page"
           (input-sign-in-credentials-and-submit)
           (wait-for-selector stonecutter-authorise-page-body)
           (screenshot "stonecutter_authorisation_form")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation"))
+          (wd/current-url) => (contains (str stonecutter-url "/authorisation")))
 
     (fact "denying app redirects to home page"
           (wd/click stonecutter-authorise-cancel-link)
@@ -160,7 +162,7 @@
           (screenshot "stonecutter_authorise_failure")
           (wd/click stonecutter-authorise-return-to-client-link)
           (wait-for-selector client-home-page-body)
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/login")
+          (wd/current-url) => (contains (str stonecutter-client-url "/login"))
           (wd/page-source) =not=> (contains "stonecutter-journey-test@tw.com"))
 
     (fact "authorising app redirects to voting page"
@@ -169,22 +171,22 @@
           (wd/click stonecutter-authorise-share-profile-button)
           (wait-for-selector client-poll-page-body)
           (screenshot "client_voting_page")
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
     (fact "logging out in client app and logging in again will skip sign in page
           and authorise page (repeats twice as there was a bug)"
           (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again)
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com")
 
           (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again)
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
     (fact "can unshare profile card and then logging in to client app will require authorising the app again"
           ;; unshare profile card
-          (wd/to "https://stonecutter.herokuapp.com/profile")
+          (wd/to (str "https://" stonecutter-url "/profile"))
           (wait-for-selector stonecutter-profile-page-body)
           (screenshot "stonecutter_profile_with_client_app")
           (wd/click stonecutter-profile-unshare-profile-card-link)
@@ -195,30 +197,30 @@
           (screenshot "stonecutter_profile_without_client_app")
 
           ;; login to client app
-          (wd/to "https://stonecutter-client.herokuapp.com")
+          (wd/to (str "https://" stonecutter-client-url))
           (logout-of-client-and-click-sign-in-to-vote)
           (wait-for-selector stonecutter-authorise-page-body)
           (screenshot "stonecutter_authorisation_form_again")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation")
+          (wd/current-url) => (contains (str stonecutter-url "/authorisation"))
 
           ;; authorise client app
           (wd/click stonecutter-authorise-share-profile-button)
           (wait-for-selector client-poll-page-body)
           (screenshot "client_voting_page_again")
-          (wd/current-url) => (contains "stonecutter-client.herokuapp.com/voting")
+          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
     (fact "can delete account from stonecutter"
           (go-to-delete-account)
           (screenshot "stonecutter_delete_account")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/delete-account")
+          (wd/current-url) => (contains (str stonecutter-url "/delete-account"))
 
           (confirm-delete-account)
           (screenshot "stonecutter_profile-deleted")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/profile-deleted"))
+          (wd/current-url) => (contains (str stonecutter-url "/profile-deleted")))
 
     (fact "can continue to authorise app even when registering a new account"
-          (wd/to "https://stonecutter-client.herokuapp.com")
+          (wd/to (str "https://" stonecutter-client-url))
           (logout-of-client-and-click-sign-in-to-vote)
           (wait-for-selector stonecutter-sign-in-page-body)
           (wd/click stonecutter-sign-in-page-register-link)
@@ -238,13 +240,13 @@
           (wait-for-selector stonecutter-authorise-page-body)
 
           (screenshot "stonecutter_authorisation_form_after_registration")
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/authorisation")
+          (wd/current-url) => (contains (str stonecutter-url "/authorisation"))
 
           ;; Cleaning up
           (go-to-delete-account)
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/delete-account")
+          (wd/current-url) => (contains (str stonecutter-url "/delete-account"))
           (confirm-delete-account)
-          (wd/current-url) => (contains "stonecutter.herokuapp.com/profile-deleted"))
+          (wd/current-url) => (contains (str stonecutter-url "/profile-deleted")))
 
     (catch Exception e
       (screenshot "ERROR")
