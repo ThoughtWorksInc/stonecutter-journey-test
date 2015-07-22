@@ -38,6 +38,8 @@
               (filter #(re-matches #".*\.png$" (.getName %)))
               (map io/delete-file))))
 
+(def scheme (get env/env :scheme "https"))
+
 (def stonecutter-url (get env/env :stonecutter-url "stonecutter.herokuapp.com"))
 (def stonecutter-sign-in-page-body ".func--sign-in-page")
 (def stonecutter-sign-in-page-register-link ".func--register__link")
@@ -75,12 +77,12 @@
   (wd/click stonecutter-sign-in-button))
 
 (defn attempt-sign-in []
-  (wd/to (str "https://" stonecutter-url "/sign-in"))
+  (wd/to (str scheme "://" stonecutter-url "/sign-in"))
   (wait-for-selector stonecutter-sign-in-page-body)
   (input-sign-in-credentials-and-submit))
 
 (defn go-to-delete-account []
-  (wd/to (str "https://" stonecutter-url "/delete-account"))
+  (wd/to (str scheme "://" stonecutter-url "/delete-account"))
   (wait-for-selector stonecutter-delete-account-page-body))
 
 (defn confirm-delete-account []
@@ -112,7 +114,7 @@
   (try
     (fact "can register a stonecutter account"
           ;; Go to home page and get redirected to sign-in
-          (wd/to (str "https://" stonecutter-url))
+          (wd/to (str scheme "://" stonecutter-url))
           (wait-for-selector stonecutter-sign-in-page-body)
           (wd/current-url) => (contains (str stonecutter-url "/sign-in"))
 
@@ -134,12 +136,12 @@
           (wd/current-url) => (contains (str stonecutter-url "/profile-created")))
 
     (fact "can sign out of stonecutter"
-          (wd/to (str "https://" stonecutter-url "/sign-out"))
+          (wd/to (str scheme "://" stonecutter-url "/sign-out"))
           (wait-for-selector stonecutter-sign-in-page-body)
           (wd/current-url) => (contains (str stonecutter-url "/sign-in")))
 
     (fact "can go to client page"
-          (wd/to (str "https://" stonecutter-client-url))
+          (wd/to (str scheme "://" stonecutter-client-url))
           (wait-for-selector client-home-page-body)
           (screenshot "client_home_page")
           (wd/current-url) => (contains (str stonecutter-client-url "/login")))
@@ -186,7 +188,7 @@
 
     (fact "can unshare profile card and then logging in to client app will require authorising the app again"
           ;; unshare profile card
-          (wd/to (str "https://" stonecutter-url "/profile"))
+          (wd/to (str scheme "://" stonecutter-url "/profile"))
           (wait-for-selector stonecutter-profile-page-body)
           (screenshot "stonecutter_profile_with_client_app")
           (wd/click stonecutter-profile-unshare-profile-card-link)
@@ -197,7 +199,7 @@
           (screenshot "stonecutter_profile_without_client_app")
 
           ;; login to client app
-          (wd/to (str "https://" stonecutter-client-url))
+          (wd/to (str scheme "://" stonecutter-client-url))
           (logout-of-client-and-click-sign-in-to-vote)
           (wait-for-selector stonecutter-authorise-page-body)
           (screenshot "stonecutter_authorisation_form_again")
@@ -220,7 +222,7 @@
           (wd/current-url) => (contains (str stonecutter-url "/profile-deleted")))
 
     (fact "can continue to authorise app even when registering a new account"
-          (wd/to (str "https://" stonecutter-client-url))
+          (wd/to (str scheme "://" stonecutter-client-url))
           (logout-of-client-and-click-sign-in-to-vote)
           (wait-for-selector stonecutter-sign-in-page-body)
           (wd/click stonecutter-sign-in-page-register-link)
