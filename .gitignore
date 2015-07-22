@@ -13,3 +13,5 @@ pom.xml.asc
 *.swo
 .vagrant
 **/screenshots/*.png
+.idea**
+*.iml
