@@ -1,0 +1,5 @@
+#!/bin/bash
+SCHEME=http \
+STONECUTTER_URL=192.168.50.60:3000 \
+STONECUTTER_CLIENT_URL=192.168.50.70:4000 \
+./run_functional_test.sh
