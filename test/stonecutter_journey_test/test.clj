@@ -40,7 +40,7 @@
 
 (def scheme (get env/env :scheme "https"))
 
-(def stonecutter-url (get env/env :stonecutter-url "stonecutter.herokuapp.com"))
+(def stonecutter-url (get env/env :stonecutter-url "sso-staging.dcentproject.eu"))
 (def stonecutter-sign-in-page-body ".func--sign-in-page")
 (def stonecutter-sign-in-page-register-link ".func--register__link")
 (def stonecutter-sign-in-email-input ".func--email__input")
