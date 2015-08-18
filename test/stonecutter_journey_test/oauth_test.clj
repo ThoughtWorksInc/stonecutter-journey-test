@@ -1,4 +1,4 @@
-(ns stonecutter-journey-test.test
+(ns stonecutter-journey-test.oauth-test
   (:require [midje.sweet :refer :all]
             [environ.core :as env]
             [clojure.java.io :as io]
@@ -144,7 +144,7 @@
           (wd/to (str scheme "://" stonecutter-client-url))
           (wait-for-selector client-home-page-body)
           (screenshot "client_home_page")
-          (wd/current-url) => (contains (str stonecutter-client-url "/login")))
+          (wd/current-url) => (contains (str stonecutter-client-url "/oauth/login")))
 
     (fact "'sign in to vote' redirects to stonecutter"
           (wd/click "button")
@@ -164,7 +164,7 @@
           (screenshot "stonecutter_authorise_failure")
           (wd/click stonecutter-authorise-return-to-client-link)
           (wait-for-selector client-home-page-body)
-          (wd/current-url) => (contains (str stonecutter-client-url "/login"))
+          (wd/current-url) => (contains (str stonecutter-client-url "/oauth/login"))
           (wd/page-source) =not=> (contains "stonecutter-journey-test@tw.com"))
 
     (fact "authorising app redirects to voting page"
@@ -173,17 +173,17 @@
           (wd/click stonecutter-authorise-share-profile-button)
           (wait-for-selector client-poll-page-body)
           (screenshot "client_voting_page")
-          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
+          (wd/current-url) => (contains (str stonecutter-client-url "/oauth/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
     (fact "logging out in client app and logging in again will skip sign in page
           and authorise page (repeats twice as there was a bug)"
           (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again)
-          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
+          (wd/current-url) => (contains (str stonecutter-client-url "/oauth/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com")
 
           (logout-of-client-and-go-through-auth-flow-again-without-having-to-sign-in-or-authorise-app-again)
-          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
+          (wd/current-url) => (contains (str stonecutter-client-url "/oauth/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
     (fact "can unshare profile card and then logging in to client app will require authorising the app again"
@@ -209,7 +209,7 @@
           (wd/click stonecutter-authorise-share-profile-button)
           (wait-for-selector client-poll-page-body)
           (screenshot "client_voting_page_again")
-          (wd/current-url) => (contains (str stonecutter-client-url "/voting"))
+          (wd/current-url) => (contains (str stonecutter-client-url "/oauth/voting"))
           (wd/page-source) => (contains "stonecutter-journey-test@tw.com"))
 
     (fact "can delete account from stonecutter"
