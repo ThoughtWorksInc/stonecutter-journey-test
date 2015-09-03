@@ -7,32 +7,11 @@
   [(before :contents (do (wd/set-driver! {:browser :firefox})
                          (c/clear-screenshots)
                          (c/delete-stale-account)))
-   (after  :contents (do (wd/quit)))]
+   (after :contents (do (wd/quit)))]
 
   (try
-    (fact "can register a stonecutter account"
-          ;; Go to home page and get redirected to sign-in
-          (wd/to (str c/scheme "://" c/stonecutter-url))
-          (c/wait-for-selector c/stonecutter-index-page-body)
-          (wd/current-url) => (contains (str c/stonecutter-url "/"))
-
-          ;; Enter user details to register
-          (wd/input-text c/stonecutter-register-email-input "stonecutter-journey-test@tw.com")
-          (wd/input-text c/stonecutter-register-password-input "password")
-          (wd/input-text c/stonecutter-register-confirm-password-input "password")
-          (wd/click c/stonecutter-register-create-profile-button)
-
-          ;; View profile created page
-          (c/wait-for-selector c/stonecutter-profile-created-page-body)
-          (c/screenshot "openid_stonecutter_profile_created_page")
-          (wd/current-url) => (contains (str c/stonecutter-url "/profile-created")))
-
-    (fact "can sign out of stonecutter"
-          (wd/to (str c/scheme "://" c/stonecutter-url "/sign-out"))
-          (c/wait-for-selector c/stonecutter-index-page-body)
-          (wd/current-url) => (contains (str c/stonecutter-url "/")))
-
     (fact "can go to client openid login page"
+          (c/register-and-sign-out)
           (wd/to (str c/scheme "://" c/stonecutter-client-url "/openid/login"))
           (c/wait-for-selector c/client-home-page-body)
           (c/screenshot "openid_client_home_page")
@@ -49,15 +28,6 @@
           (c/wait-for-selector c/stonecutter-authorise-page-body)
           (c/screenshot "openid_stonecutter_authorisation_form")
           (wd/current-url) => (contains (str c/stonecutter-url "/authorisation")))
-
-    (fact "denying app redirects to home page"
-          (wd/click c/stonecutter-authorise-cancel-link)
-          (c/wait-for-selector c/stonecutter-authorise-failure-body)
-          (c/screenshot "openid_stonecutter_authorise_failure")
-          (wd/click c/stonecutter-authorise-return-to-client-link)
-          (c/wait-for-selector c/client-home-page-body)
-          (wd/current-url) => (contains (str c/stonecutter-client-url "/"))
-          (wd/page-source) =not=> (contains "stonecutter-journey-test@tw.com"))
 
     (fact "authorising app redirects to voting page"
           (wd/to (str c/scheme "://" c/stonecutter-client-url "/openid/login"))

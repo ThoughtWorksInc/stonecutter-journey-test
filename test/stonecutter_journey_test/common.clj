@@ -65,6 +65,17 @@
   (wd/input-text stonecutter-sign-in-password-input "password")
   (wd/click stonecutter-sign-in-button))
 
+(defn register-and-sign-out []
+  (wd/to (str c/scheme "://" stonecutter-url))
+  (wait-for-selector stonecutter-index-page-body)
+  (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
+  (wd/input-text stonecutter-register-password-input "password")
+  (wd/input-text stonecutter-register-confirm-password-input "password")
+  (wd/click stonecutter-register-create-profile-button)
+  (wait-for-selector stonecutter-profile-created-page-body)
+  (wd/to (str scheme "://" stonecutter-url "/sign-out"))
+  (wait-for-selector stonecutter-index-page-body))
+
 (defn attempt-sign-in []
   (wd/to (str scheme "://" stonecutter-url "/"))
   (wait-for-selector stonecutter-index-page-body)
