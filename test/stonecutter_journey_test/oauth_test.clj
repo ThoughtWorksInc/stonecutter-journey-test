@@ -41,15 +41,13 @@
 (def scheme (get env/env :scheme "https"))
 
 (def stonecutter-url (get env/env :stonecutter-url "sso-staging.dcentproject.eu"))
-(def stonecutter-sign-in-page-body ".func--sign-in-page")
-(def stonecutter-sign-in-page-register-link ".func--register__link")
-(def stonecutter-sign-in-email-input ".func--email__input")
-(def stonecutter-sign-in-password-input ".func--password__input")
+(def stonecutter-index-page-body ".func--index-page")
+(def stonecutter-sign-in-email-input ".func--sign-in-email__input")
+(def stonecutter-sign-in-password-input ".func--sign-in-password__input")
 (def stonecutter-sign-in-button ".func--sign-in__button")
-(def stonecutter-register-page-body ".func--register-page")
-(def stonecutter-register-email-input ".func--email__input")
-(def stonecutter-register-password-input ".func--password__input")
-(def stonecutter-register-confirm-password-input ".func--confirm-password__input")
+(def stonecutter-register-email-input ".func--registration-email__input")
+(def stonecutter-register-password-input ".func--registration-password__input")
+(def stonecutter-register-confirm-password-input ".func--registration-confirm-password__input")
 (def stonecutter-register-create-profile-button ".func--create-profile__button")
 (def stonecutter-profile-page-body ".func--profile-page")
 (def stonecutter-profile-unshare-profile-card-link ".func--app-item__unshare-link")
@@ -77,8 +75,8 @@
   (wd/click stonecutter-sign-in-button))
 
 (defn attempt-sign-in []
-  (wd/to (str scheme "://" stonecutter-url "/sign-in"))
-  (wait-for-selector stonecutter-sign-in-page-body)
+  (wd/to (str scheme "://" stonecutter-url "/"))
+  (wait-for-selector stonecutter-index-page-body)
   (input-sign-in-credentials-and-submit))
 
 (defn go-to-delete-account []
@@ -115,14 +113,8 @@
     (fact "can register a stonecutter account"
           ;; Go to home page and get redirected to sign-in
           (wd/to (str scheme "://" stonecutter-url))
-          (wait-for-selector stonecutter-sign-in-page-body)
-          (wd/current-url) => (contains (str stonecutter-url "/sign-in"))
-
-          ;; Click through to register page
-          (wd/click stonecutter-sign-in-page-register-link)
-          (wait-for-selector stonecutter-register-page-body)
-          (screenshot "stonecutter_register_page")
-          (wd/current-url) => (contains (str stonecutter-url "/register"))
+          (wait-for-selector stonecutter-index-page-body)
+          (wd/current-url) => (contains (str stonecutter-url "/"))
 
           ;; Enter user details to register
           (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
@@ -137,8 +129,8 @@
 
     (fact "can sign out of stonecutter"
           (wd/to (str scheme "://" stonecutter-url "/sign-out"))
-          (wait-for-selector stonecutter-sign-in-page-body)
-          (wd/current-url) => (contains (str stonecutter-url "/sign-in")))
+          (wait-for-selector stonecutter-index-page-body)
+          (wd/current-url) => (contains (str stonecutter-url "/")))
 
     (fact "can go to client page"
           (wd/to (str scheme "://" stonecutter-client-url))
@@ -148,9 +140,9 @@
 
     (fact "'sign in to vote' redirects to stonecutter"
           (wd/click "button")
-          (wait-for-selector stonecutter-sign-in-page-body)
+          (wait-for-selector stonecutter-index-page-body)
           (screenshot "stonecutter_sign_in")
-          (wd/current-url) => (contains (str stonecutter-url "/sign-in")))
+          (wd/current-url) => (contains (str stonecutter-url "/")))
 
     (fact "can sign in with existing user credentials and redirects to authorisation form page"
           (input-sign-in-credentials-and-submit)
@@ -224,9 +216,7 @@
     (fact "can continue to authorise app even when registering a new account"
           (wd/to (str scheme "://" stonecutter-client-url))
           (logout-of-client-and-click-sign-in-to-vote)
-          (wait-for-selector stonecutter-sign-in-page-body)
-          (wd/click stonecutter-sign-in-page-register-link)
-          (wait-for-selector stonecutter-register-page-body)
+          (wait-for-selector stonecutter-index-page-body)
 
           ;; Enter user details to register
           (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
