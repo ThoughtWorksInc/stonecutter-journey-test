@@ -66,7 +66,7 @@
   (wd/click stonecutter-sign-in-button))
 
 (defn attempt-sign-in []
-  (wd/to (str scheme "://" stonecutter-url "/sign-in"))
+  (wd/to (str scheme "://" stonecutter-url "/"))
   (wait-for-selector stonecutter-index-page-body)
   (input-sign-in-credentials-and-submit))
 
@@ -81,7 +81,7 @@
 (defn delete-stale-account []
   (attempt-sign-in)
   (wait-for-selector "body")
-  (when-not (re-find #"/sign-in" (wd/current-url))
+  (when (re-find #"/profile" (wd/current-url))
     (go-to-delete-account)
     (confirm-delete-account)))
 

@@ -14,7 +14,7 @@
           ;; Go to home page and get redirected to sign-in
           (wd/to (str c/scheme "://" c/stonecutter-url))
           (c/wait-for-selector c/stonecutter-index-page-body)
-          (wd/current-url) => (contains (str c/stonecutter-url "/sign-in"))
+          (wd/current-url) => (contains (str c/stonecutter-url "/"))
 
           ;; Enter user details to register
           (wd/input-text c/stonecutter-register-email-input "stonecutter-journey-test@tw.com")
@@ -30,7 +30,7 @@
     (fact "can sign out of stonecutter"
           (wd/to (str c/scheme "://" c/stonecutter-url "/sign-out"))
           (c/wait-for-selector c/stonecutter-index-page-body)
-          (wd/current-url) => (contains (str c/stonecutter-url "/sign-in")))
+          (wd/current-url) => (contains (str c/stonecutter-url "/")))
 
     (fact "can go to client openid login page"
           (wd/to (str c/scheme "://" c/stonecutter-client-url "/openid/login"))
@@ -42,7 +42,7 @@
           (wd/click "button")
           (c/wait-for-selector c/stonecutter-index-page-body)
           (c/screenshot "openid_stonecutter_sign_in")
-          (wd/current-url) => (contains (str c/stonecutter-url "/sign-in")))
+          (wd/current-url) => (contains (str c/stonecutter-url "/")))
 
     (fact "can sign in with existing user credentials and redirects to authorisation form page"
           (c/input-sign-in-credentials-and-submit)
