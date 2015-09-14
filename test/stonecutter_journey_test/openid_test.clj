@@ -92,7 +92,6 @@
           ;; Enter user details to register
           (wd/input-text c/stonecutter-register-email-input "stonecutter-journey-test@tw.com")
           (wd/input-text c/stonecutter-register-password-input "password")
-          (wd/input-text c/stonecutter-register-confirm-password-input "password")
           (wd/click c/stonecutter-register-create-profile-button)
 
           ;; View profile created page
