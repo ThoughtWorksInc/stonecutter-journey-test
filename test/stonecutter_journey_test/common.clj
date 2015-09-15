@@ -62,16 +62,21 @@
 (def scheme (get env/env :scheme "https"))
 
 (defn input-sign-in-credentials-and-submit []
-  (wd/input-text stonecutter-register-first-name-input "Journey")
-  (wd/input-text stonecutter-register-last-name-input "Test")
   (wd/input-text stonecutter-sign-in-email-input "stonecutter-journey-test@tw.com")
   (wd/input-text stonecutter-sign-in-password-input "password")
   (wd/click stonecutter-sign-in-button))
 
+(defn input-register-credentials-and-submit []
+  (wd/input-text stonecutter-register-first-name-input "Journey")
+  (wd/input-text stonecutter-register-last-name-input "Test")
+  (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
+  (wd/input-text stonecutter-register-password-input "password")
+  (wd/click stonecutter-register-create-profile-button))
+
 (defn register-and-sign-out []
   (wd/to (str scheme "://" stonecutter-url))
   (wait-for-selector stonecutter-index-page-body)
-  (input-sign-in-credentials-and-submit)
+  (input-register-credentials-and-submit)
   (wait-for-selector stonecutter-profile-created-page-body)
   (wd/to (str scheme "://" stonecutter-url "/sign-out"))
   (wait-for-selector stonecutter-index-page-body))

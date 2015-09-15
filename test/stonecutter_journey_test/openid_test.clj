@@ -89,7 +89,7 @@
           (c/logout-of-client-and-click-sign-in-to-vote)
           (c/wait-for-selector c/stonecutter-index-page-body)
 
-          (c/input-sign-in-credentials-and-submit)
+          (c/input-register-credentials-and-submit)
 
           ;; View profile created page
           (c/wait-for-selector c/stonecutter-profile-created-page-body)
