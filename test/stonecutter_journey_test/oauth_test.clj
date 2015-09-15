@@ -18,6 +18,8 @@
           (wd/current-url) => (contains (str c/stonecutter-url "/"))
 
           ;; Enter user details to register
+          (wd/input-text c/stonecutter-register-first-name-input "Journey")
+          (wd/input-text c/stonecutter-register-last-name-input "Test")
           (wd/input-text c/stonecutter-register-email-input "stonecutter-journey-test@tw.com")
           (wd/input-text c/stonecutter-register-password-input "password")
           (wd/click c/stonecutter-register-create-profile-button)
@@ -117,10 +119,7 @@
           (c/logout-of-client-and-click-sign-in-to-vote)
           (c/wait-for-selector c/stonecutter-index-page-body)
 
-          ;; Enter user details to register
-          (wd/input-text c/stonecutter-register-email-input "stonecutter-journey-test@tw.com")
-          (wd/input-text c/stonecutter-register-password-input "password")
-          (wd/click c/stonecutter-register-create-profile-button)
+          (c/input-sign-in-credentials-and-submit)
 
           ;; View profile created page
           (c/wait-for-selector c/stonecutter-profile-created-page-body)

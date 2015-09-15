@@ -9,6 +9,8 @@
 (def stonecutter-sign-in-email-input ".func--sign-in-email__input")
 (def stonecutter-sign-in-password-input ".func--sign-in-password__input")
 (def stonecutter-sign-in-button ".func--sign-in__button")
+(def stonecutter-register-first-name-input ".func--registration-first-name__input")
+(def stonecutter-register-last-name-input ".func--registration-last-name__input")
 (def stonecutter-register-email-input ".func--registration-email__input")
 (def stonecutter-register-password-input ".func--registration-password__input")
 (def stonecutter-register-create-profile-button ".func--create-profile__button")
@@ -60,6 +62,8 @@
 (def scheme (get env/env :scheme "https"))
 
 (defn input-sign-in-credentials-and-submit []
+  (wd/input-text stonecutter-register-first-name-input "Journey")
+  (wd/input-text stonecutter-register-last-name-input "Test")
   (wd/input-text stonecutter-sign-in-email-input "stonecutter-journey-test@tw.com")
   (wd/input-text stonecutter-sign-in-password-input "password")
   (wd/click stonecutter-sign-in-button))
@@ -67,9 +71,7 @@
 (defn register-and-sign-out []
   (wd/to (str scheme "://" stonecutter-url))
   (wait-for-selector stonecutter-index-page-body)
-  (wd/input-text stonecutter-register-email-input "stonecutter-journey-test@tw.com")
-  (wd/input-text stonecutter-register-password-input "password")
-  (wd/click stonecutter-register-create-profile-button)
+  (input-sign-in-credentials-and-submit)
   (wait-for-selector stonecutter-profile-created-page-body)
   (wd/to (str scheme "://" stonecutter-url "/sign-out"))
   (wait-for-selector stonecutter-index-page-body))
